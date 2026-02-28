@@ -44,7 +44,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader, IterableDataset
 from torch.optim import AdamW
-from torch.cuda.amp import autocast, GradScaler
+from torch.amp import autocast, GradScaler
 
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -306,7 +306,7 @@ class CloudTrainer:
             input_bytes = batch['input'].to(self.device)
             target_bytes = batch['target'].to(self.device)
             
-            with autocast(device_type='cuda', dtype=self.dtype, enabled=self.dtype != torch.float32):
+            with autocast('cuda', dtype=self.dtype, enabled=self.dtype != torch.float32):
                 output = self.model(input_bytes, target_bytes)
             
             total_loss += output['loss'].item() * input_bytes.numel()
@@ -377,7 +377,7 @@ class CloudTrainer:
                 target_bytes = batch['target'].to(self.device)
                 
                 # Forward
-                with autocast(device_type='cuda', dtype=self.dtype, enabled=self.dtype != torch.float32):
+                with autocast('cuda', dtype=self.dtype, enabled=self.dtype != torch.float32):
                     output = self.model(input_bytes, target_bytes)
                     loss = output['loss'] / self.grad_accum_steps
                 
