@@ -205,10 +205,18 @@ class LocalDecoder(nn.Module):
         # Cross-attention with residual
         # Bytes (queries) attend to their patch (keys/values)
         x = byte_encodings
+        # CRITICAL: Create causal mask to prevent future information leakage
+        seq_len = x.shape[1]
+        causal_mask = torch.triu(
+            torch.ones(seq_len, seq_len, device=x.device, dtype=torch.bool),
+            diagonal=1
+        )
+        
         attn_out, _ = self.cross_attn(
             query=x,
             key=patch_for_bytes,
             value=patch_for_bytes,
+            attn_mask=causal_mask,  # Prevents future leak
         )
         x = self.cross_norm(x + attn_out)
         
