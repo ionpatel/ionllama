@@ -215,9 +215,11 @@ class CloudTrainer:
         self.model = model.to(self.device)
         
         # Compile if PyTorch 2.0+
-        if hasattr(torch, 'compile') and self.device.type == 'cuda':
-            print("Compiling model with torch.compile...")
-            self.model = torch.compile(self.model, mode='reduce-overhead')
+        # Disabled for now - dynamic patching causes graph breaks
+        # if hasattr(torch, 'compile') and self.device.type == 'cuda':
+        #     print("Compiling model with torch.compile...")
+        #     self.model = torch.compile(self.model, mode='reduce-overhead')
+        print("Note: torch.compile disabled (dynamic patching not compatible)")
         
         # Data
         self.train_loader = train_loader
